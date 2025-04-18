@@ -3,3 +3,10 @@ description: A compiler for tiled sparsity in Triton.
 theme: just-the-docs
 
 url: https://paramathic.github.io/stoicc-docs/
+
+math: mathjax
+
+callouts:
+  note:
+    title: Note
+    color: blue
