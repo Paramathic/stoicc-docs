@@ -1,35 +1,41 @@
 ---
-title: Home
+title: STOICC
 layout: home
+nav_order: 0
 ---
 
-This is a *bare-minimum* template to create a Jekyll site that uses the [Just the Docs] theme. You can easily set the created site to be published on [GitHub Pages] – the [README] file explains how to do that, along with other details.
+# **STOICC**: The **S**parse **T**ile **MO**sa**IC** **C**ompiler
 
-If [Jekyll] is installed on your computer, you can also build and preview the created site *locally*. This lets you test changes before committing them, and avoids waiting for GitHub Pages.[^1] And you will be able to deploy your local build to a different platform than GitHub Pages.
+## Overview
 
-More specifically, the created site:
+Sparsity is uniquitous in domains such as machine learning, where weight matrices for linear layers can be pruned to create sparse matrices. To achieve the best balance between model accuracy, memory usage, and performance, different sparse formats are more optimal for different regions of the sparse matrix. However, current tools only allow a single sparse format to be used per matrix.
 
-- uses a gem-based approach, i.e. uses a `Gemfile` and loads the `just-the-docs` gem
-- uses the [GitHub Pages / Actions workflow] to build and publish the site on GitHub Pages
+**We introduce STOICC, a novel tile-based sparsity compiler that enables multiple sparse formats to coexist in the same matrix.**
 
-Other than that, you're free to customize sites that you create with this template, however you like. You can easily change the versions of `just-the-docs` and Jekyll it uses, as well as adding further plugins.
+[Code Coming Soon](/){: .btn .btn-blue }
 
-[Browse our documentation][Just the Docs] to learn more about how to use this theme.
+## Inspector-Executor Tools for Sparsity 
 
-To get started with creating a site, simply:
+Compilers[^1] must optimize sparse matrix operations to achieve performance. This is commonly done in two phases:
 
-1. click "[use this template]" to create a GitHub repository
-2. go to Settings > Pages > Build and deployment > Source, and select GitHub Actions
+* **The Inspector**: Inspects data sparsity pattern and performs reordering, compression, and scheduling.
+* **The Executor**: Uses data and schedule to perform SpMM operations.
 
-If you want to maintain your docs in the `docs` directory of an existing project repo, see [Hosting your docs from an existing project repo](https://github.com/just-the-docs/just-the-docs-template/blob/main/README.md#hosting-your-docs-from-an-existing-project-repo) in the template README.
+<img src="media/inspector_executor.svg"  alt="Inspector/Executor Framework">
+
+## STOICC Pipeline
+
+The STOICC [Inspector]({% link inspector_executor.md %}#inspector) takes in a sparse matrix. It then inspects the data sparsity to assign tile sparsity types, compress/reorder data, and create a schedule. This schedule is then used along with the data by an [Executor]({% link inspector_executor.md %}#executor) written in [Triton](https://triton-lang.org/) to perform the SpMM operation. Finally, the [Sparse Compiler]({% link sparse_compiler.md %})---our modified Triton compiler---is used to lower the executor code to the GPU. 
+
+<img src="media/stoicc.svg"  alt="STOICC">
+
+## Results
+
+Results coming soon
+{: .label .label-yellow }
 
 ----
 
-[^1]: [It can take up to 10 minutes for changes to your site to publish after you push the changes to GitHub](https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/creating-a-github-pages-site-with-jekyll#creating-your-site).
+### References
 
-[Just the Docs]: https://just-the-docs.github.io/just-the-docs/
-[GitHub Pages]: https://docs.github.com/en/pages
-[README]: https://github.com/just-the-docs/just-the-docs-template/blob/main/README.md
-[Jekyll]: https://jekyllrb.com
-[GitHub Pages / Actions workflow]: https://github.blog/changelog/2022-07-27-github-pages-custom-github-actions-workflows-beta/
-[use this template]: https://github.com/just-the-docs/just-the-docs-template/generate
+[^1]: [L. Wilkinson, K. Cheshmi, and M. M. Dehnavi, ‘Register Tiling for Unstructured Sparsity in Neural Network Inference’, Proc. ACM Program. Lang., vol. 7, no. PLDI, Jun. 2023.](https://doi.org/10.1145/3591302)

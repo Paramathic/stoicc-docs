@@ -1,8 +1,6 @@
-title: Just the Docs Template
-description: A starter template for a Jeykll site using the Just the Docs theme!
+title: Sparse Tile Mosaic Compiler
+description: A compiler for tiled sparsity in Triton.
 theme: just-the-docs
+footer_content: '<a href="http://www.paramathic.com/">Parmathics Group</a>'
 
-url: https://just-the-docs.github.io
-
-aux_links:
-  Template Repository: https://github.com/just-the-docs/just-the-docs-template
+url: https://paramathic.github.io/stoicc-docs/
