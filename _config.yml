@@ -1,6 +1,5 @@
 title: Sparse Tile Mosaic Compiler
 description: A compiler for tiled sparsity in Triton.
 theme: just-the-docs
-footer_content: '<a href="http://www.paramathic.com/">Parmathics Group</a>'
 
 url: https://paramathic.github.io/stoicc-docs/
