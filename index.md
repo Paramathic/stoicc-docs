@@ -31,8 +31,18 @@ The STOICC [Inspector]({% link inspector_executor.md %}#inspector) takes in a sp
 
 ## Results
 
-Results coming soon
-{: .label .label-yellow }
+<!-- Results coming soon
+{: .label .label-yellow } -->
+We benchmark STOICC on an NVIDIA A100 (80GB) GPU with a mixture of dense tiles and [2:4](https://developer.nvidia.com/blog/structured-sparsity-in-the-nvidia-ampere-architecture-and-applications-in-search-engines/) sparse tiles, where the 2:4 tiles are selected randomly. For example, "50% 2:4 Tiles" corresponds to a scenario where half of the tiles are pruned to 2:4 sparsity while the other half remain dense, resulting in an overall sparsity level of 25% for the whole matrix. The matrix sizes are chosen based on those used in the OPT family of models. 
+
+<img src="media/heterogeneous_bs16.png" alt="batch size 16 heterogeneous results">
+<img src="media/heterogeneous_bs32.png" alt="batch size 32 heterogeneous results">
+
+
+We also compare STOICC performance with 100% 2:4 tiles against the CUTLASS 2:4 sparse kernel integrated in PyTorch.
+
+<img src="media/full2_4_bs2048.png" alt="2:4 comparison against CUTLASS 2:4, batch size 2k">
+<img src="media/full2_4_bs4096.png" alt="2:4 comparison against CUTLASS 2:4, batch size 4k">
 
 ----
 
