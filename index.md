@@ -12,7 +12,7 @@ Sparsity is ubiquitous in domains such as machine learning, where weight matrice
 
 **We introduce STOICC, a novel tile-based sparsity compiler that enables multiple sparse formats to coexist in the same matrix.**
 
-[Code Coming Soon](/){: .btn .btn-blue }
+[Code Available on GitHub](https://github.com/Paramathic/stoicc){: .btn .btn-blue }
 
 ## Inspector-Executor Tools for Sparsity 
 
@@ -41,8 +41,8 @@ We benchmark STOICC on an NVIDIA A100 (80GB) GPU with a mixture of dense tiles a
 
 We also compare STOICC performance with 100% 2:4 tiles against the CUTLASS 2:4 sparse kernel integrated in PyTorch.
 
-<img src="media/full2_4_bs2048.svg" alt="2:4 comparison against CUTLASS 2:4, batch size 2k">
-<img src="media/full2_4_bs4096.svg" alt="2:4 comparison against CUTLASS 2:4, batch size 4k">
+<img src="media/opt175B_bs16.svg" alt="2:4 comparison against CUTLASS 2:4, batch size 2k">
+<img src="media/opt175B_bs32.svg" alt="2:4 comparison against CUTLASS 2:4, batch size 4k">
 
 ----
 
