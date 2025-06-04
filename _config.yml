@@ -6,6 +6,9 @@ url: https://paramathic.github.io/stoicc-docs/
 
 math: mathjax
 
+ga_tracking: G-4R3QLR49DS
+ga_tracking_anonymize_ip: true 
+
 callouts:
   note:
     title: Note
