@@ -1,4 +1,4 @@
-name: Deploy Jekyll Site to GitHub Pages
+name: Deploy Jekyll site to Pages
 
 on:
   push:
@@ -20,27 +20,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+      
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.3"  # Matches the Ruby version in the error logs
-          bundler-cache: true  # Automatically runs 'bundle install' and caches gems
-
+          ruby-version: '3.2'
+          bundler-cache: true
+      
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
-        # If Pages isn't enabled yet, add: with: { enablement: true }
-
+      
       - name: Build with Jekyll
-        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}" --trace --verbose
+        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
           JEKYLL_ENV: production
-
-      - name: Upload Artifact
+      
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./_site  # Default output directory for Jekyll builds
 
   deploy:
     environment:
