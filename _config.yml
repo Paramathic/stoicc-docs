@@ -2,7 +2,7 @@ title: Hybrid Tile Sparsity
 description: A compiler for tiled sparsity in Triton.
 theme: just-the-docs
 
-url: https://paramathic.github.io/stoicc-docs/
+url: https://paramathic.github.io/hybrid-sparsity/
 
 math: mathjax
 
