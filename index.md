@@ -24,8 +24,8 @@ Semi-structured sparsity patterns, including the 2:4 format[^6] supported by NVI
 # **Hybrid Tile Sparsity**
 
 To overcome these limitations, we introduce two complementary innovations: PATCH and STOICC. 
-- [PATCH](./pages/patch.md): PATCH learns a hybrid mask that divides each weight matrix into hardware-friendly tiles, classifying each tile as either fully dense (0% sparsity) or 2:4 sparse (50% sparsity). This adaptive masking enables the matrix to achieve an effective global sparsity ratio between 0% and 50%, preserving accuracy in sensitive regions while applying efficient sparsity elsewhere. 
-- [STOICC](./pages/stoicc.md): Complementing this, the STOICC compiler—built atop OpenAI's Triton[^11], seamlessly accelerates PATCH-generated models through its robust support for hybrid sparsity.
+- [PATCH]({% link pages/patch.md %}): PATCH learns a hybrid mask that divides each weight matrix into hardware-friendly tiles, classifying each tile as either fully dense (0% sparsity) or 2:4 sparse (50% sparsity). This adaptive masking enables the matrix to achieve an effective global sparsity ratio between 0% and 50%, preserving accuracy in sensitive regions while applying efficient sparsity elsewhere. 
+- [STOICC]({% link pages/stoicc.md %}): Complementing this, the STOICC compiler—built atop OpenAI's Triton[^11], seamlessly accelerates PATCH-generated models through its robust support for hybrid sparsity.
 
 When combining STOICC and PATCH on LLaMA-2 7B deployed on a consumer-grade A6000 GPU, we realize 1.18×–1.38× end-to-end speedups over the dense baseline, alongside accuracy gains of 0.37%–2.96% relative to the leading 2:4 pruning method, MaskLLM.
 
