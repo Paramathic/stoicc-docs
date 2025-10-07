@@ -1,4 +1,4 @@
-title: Sparse Tile Mosaic Compiler
+title: Hybrid Tile Sparsity
 description: A compiler for tiled sparsity in Triton.
 theme: just-the-docs
 
@@ -7,9 +7,20 @@ url: https://paramathic.github.io/stoicc-docs/
 math: mathjax
 
 ga_tracking: G-4R3QLR49DS
-ga_tracking_anonymize_ip: true 
+ga_tracking_anonymize_ip: true
 
 callouts:
   note:
     title: Note
     color: blue
+
+
+collections:
+  pages:
+    output: true
+    permalink: /:path/
+
+just_the_docs:
+  collections:
+    pages:
+      name: "Documentation"

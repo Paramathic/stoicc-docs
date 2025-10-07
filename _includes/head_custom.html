@@ -5,3 +5,73 @@
     {% include mathjax.html %}
 {% endcase %}
 
+<style>
+/* ===========================
+   Layout Adjustments
+   =========================== */
+
+/* Sidebar: move slightly right (controls left gap) */
+.side-bar {
+  position: fixed;
+  left: -25rem;           /* ← controls how far from left edge */
+  width: 800px;           /* sidebar width */
+}
+
+/* Root layout variables */
+:root {
+  --nav-width: 200px;     /* must match .side-bar width */
+  --main-content-max-width: 1050px;  /* wider text area */
+}
+
+/* Main content: shift left to fill the space properly */
+.main-content {
+  margin-left: calc(var(--nav-width) - 25rem); /* controls gap between sidebar and content */
+  padding: 2rem;
+  max-width: var(--main-content-max-width);
+}
+
+/* ===========================
+   Typography and Sizing
+   =========================== */
+
+/* Make text slightly bigger and justified */
+.main-content p {
+  text-align: justify;
+  text-justify: inter-word;
+  font-size: 1.05rem;      /* bump up text size */
+  line-height: 1.8;
+}
+
+/* Make list items and callouts match */
+li, .callout p {
+  text-align: justify;
+  text-justify: inter-word;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+/* Scale up inline images slightly, keep alignment */
+.main-content img {
+  max-width: 105%;         /* allows a touch of overflow for larger visuals */
+  height: auto;
+  display: block;
+  margin: 1rem auto;
+}
+
+/* ===========================
+   Responsive Tweaks
+   =========================== */
+@media (max-width: 1100px) {
+  .side-bar {
+    left: 1rem;
+    width: 220px;
+  }
+  .main-content {
+    margin-left: calc(var(--nav-width) + 1.5rem);
+    padding: 1.5rem;
+  }
+  .main-content p, li {
+    font-size: 1rem;
+  }
+}
+</style>

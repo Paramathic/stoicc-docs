@@ -1,51 +1,45 @@
 ---
-title: STOICC
+title: Hybrid Tile Sparsity
 layout: home
 nav_order: 0
 ---
 
-# **STOICC**: The **S**parse **T**ile **MO**sa**IC** **C**ompiler
+<img src="pages/media/hybrid_sparsity_logo.svg" alt="Hybrid Tile Sparsity Logo" style="width:300px;"/>
+<div class="btn-row" style="text-align:center;">
+  <a href="https://github.com/Paramathic/patch" class="btn btn-blue">PATCH GitHub</a>
+  <a href="https://github.com/Paramathic/stoicc" class="btn btn-purple">STOICC GitHub</a>
+</div>
 
-## Overview
+# **Introduction**
 
-Sparsity is ubiquitous in domains such as machine learning, where weight matrices for linear layers can be pruned to create sparse matrices. To achieve the best balance between model accuracy, memory usage, and performance, different sparse formats are more optimal for different regions of the sparse matrix. However, current tools only allow a single sparse format to be used per matrix.
-
-**We introduce STOICC, a novel tile-based sparsity compiler that enables multiple sparse formats to coexist in the same matrix.**
-
-[Code Available on GitHub](https://github.com/Paramathic/stoicc){: .btn .btn-blue }
-
-## Inspector-Executor Tools for Sparsity 
-
-Compilers[^1] must optimize sparse matrix operations to achieve performance. This is commonly done in two phases:
-
-* **The Inspector**: Inspects data sparsity pattern and performs reordering, compression, and scheduling.
-* **The Executor**: Uses data and schedule to perform SpMM operations.
-
-<img src="media/inspector_executor.svg"  alt="Inspector/Executor Framework">
-
-## STOICC Pipeline
-
-The STOICC [Inspector]({% link inspector_executor.md %}#inspector) takes in a sparse matrix. It then inspects the data sparsity to assign tile sparsity types, compress/reorder data, and create a schedule. This schedule is then used along with the data by an [Executor]({% link inspector_executor.md %}#executor) written in [Triton](https://triton-lang.org/) to perform the SpMM operation. Finally, the [Sparse Compiler]({% link sparse_compiler.md %})---our modified Triton compiler---is used to lower the executor code to the GPU. 
-
-<img src="media/stoicc.svg"  alt="STOICC">
-
-## Results
-
-<!-- Results coming soon
-{: .label .label-yellow } -->
-We benchmark STOICC on an NVIDIA A100 (80GB) GPU with a mixture of dense tiles and [2:4](https://developer.nvidia.com/blog/structured-sparsity-in-the-nvidia-ampere-architecture-and-applications-in-search-engines/) sparse tiles, where the 2:4 tiles are selected randomly. For example, "50% 2:4 Tiles" corresponds to a scenario where half of the tiles are pruned to 2:4 sparsity while the other half remain dense, resulting in an overall sparsity level of 25% for the whole matrix. The matrix sizes are chosen based on those used in the OPT family of models. 
-
-<img src="media/heterogeneous_bs16.svg" alt="batch size 16 heterogeneous results">
-<img src="media/heterogeneous_bs32.svg" alt="batch size 32 heterogeneous results">
+Although large language models (LLMs) excel in understanding and generating natural language, their enormous parameter sizes make them costly to operate, imposing substantial memory demands and high inference expenses, particularly during deployment. To address these challenges, techniques such as quantization and pruning have emerged to reduce inference costs while aiming to preserve model accuracy, though often with trade-offs compared to their denser counterparts.
 
 
-We also compare STOICC performance with 100% 2:4 tiles against the CUTLASS 2:4 sparse kernel integrated in PyTorch.
+Quantization effectively lowers the memory and computational overhead of LLMs, but it encounters significant hurdles in low-bitwidth scenarios.[^1]<sup>,</sup>[^2] Recent research has demonstrated that integrating sparsity with quantization offers a promising alternative to further advance LLM compression.[^3][^12]
 
-<img src="media/opt175B_bs16.svg" alt="2:4 comparison against CUTLASS 2:4, batch size 2k">
-<img src="media/opt175B_bs32.svg" alt="2:4 comparison against CUTLASS 2:4, batch size 4k">
+Unstructured sparsity, where non-zero elements can appear anywhere in a weight matrix, enables models to maintain high accuracy even when up to 50% of weights are pruned. Methods like SparseGPT[^3] and Wanda[^4] facilitate such pruning with minimal performance degradation. However, while unstructured sparsity provides strong compression benefits, it is challenging to accelerate on modern GPUs due to irregular memory access patterns. Hardware-optimized approaches, such as FlashLLM[^5], typically achieve meaningful inference speedups only at extreme sparsity levels (80% or higher). This tension between accuracy retention and hardware efficiency highlights the value of semi-structured sparsity formats, like the 2:4 pattern, which strike a more practical balance between performance and deployability.
 
-----
+Semi-structured sparsity patterns, including the 2:4 format[^6] supported by NVIDIA and AMD GPUs, deliver tangible speedups for large-scale model inference. Unlike the flexibility of unstructured sparsity, however, the 2:4 pattern imposes strict constraints by requiring exactly two of every four consecutive elements to be zero. This rigidity frequently results in notable accuracy drops when applied via one-shot pruning methods.[^3]<sup>,</sup>[^4]<sup>,</sup>[^7] Furthermore, studies indicate that sparsity should be distributed adaptively across layers for optimal results, rather than uniformly as enforced by 2:4.[^8]<sup>,</sup>[^9]<sup>,</sup>[^10] These drawbacks reveal that 2:4 sparsity alone falls short, emphasizing the necessity for hybrid strategies that combine the best of both worlds.
+
+# **Hybrid Tile Sparsity**
+
+To overcome these limitations, we introduce two complementary innovations: PATCH and STOICC. 
+- [PATCH](./pages/patch.md): PATCH learns a hybrid mask that divides each weight matrix into hardware-friendly tiles, classifying each tile as either fully dense (0% sparsity) or 2:4 sparse (50% sparsity). This adaptive masking enables the matrix to achieve an effective global sparsity ratio between 0% and 50%, preserving accuracy in sensitive regions while applying efficient sparsity elsewhere. 
+- [STOICC](./pages/stoicc.md): Complementing this, the STOICC compiler—built atop OpenAI's Triton[^11], seamlessly accelerates PATCH-generated models through its robust support for hybrid sparsity.
+
+When combining STOICC and PATCH on LLaMA-2 7B deployed on a consumer-grade A6000 GPU, we realize 1.18×–1.38× end-to-end speedups over the dense baseline, alongside accuracy gains of 0.37%–2.96% relative to the leading 2:4 pruning method, MaskLLM.
+
 
 ### References
-
-[^1]: [L. Wilkinson, K. Cheshmi, and M. M. Dehnavi, ‘Register Tiling for Unstructured Sparsity in Neural Network Inference’, Proc. ACM Program. Lang., vol. 7, no. PLDI, Jun. 2023.](https://doi.org/10.1145/3591302)
+[^1]: [Lin, J., Tang, J., Tang, H., Yang, S., Chen, W.-M., Wang, W.-C., Xiao, G., Dang, X., Gan, C., and Han, S. AWQ: Activation-aware weight quantization for on-device llm compression and acceleration. MLSys, 2024.](https://arxiv.org/abs/2306.00978)
+[^2]: [Mohammad Mozaffari, Amir Yazdanbakhsh, and Maryam Mehri Dehnavi. SLiM: One-shot Quantized Sparse Plus Low-rank Approximation of LLMs, 2025a.](https://arxiv.org/abs/2410.09615)
+[^3]: [Frantar, E. and Alistarh, D. Sparsegpt: Massive language models can be accurately pruned in one-shot. In ICML, 2023.](https://arxiv.org/abs/2301.00774)
+[^4]: [Sun, M., Liu, Z., Bair, A., and Kolter, J. Z. A simple and effective pruning approach for large language models.](https://arxiv.org/abs/2306.11695)
+[^5]: [Xia, H., Zheng, Z., Li, Y., Zhuang, D., Zhou, Z., Qiu, X., Li, Y., Lin, W., and Song, S. L. Flash-llm: Enabling cost-effective and highly-efficient large generative model inference with unstructured sparsity.](https://arxiv.org/abs/2309.10285)
+[^6]: [Mishra, A., Latorre, J. A., Pool, J., Stosic, D., Stosic, D., Venkatesh, G., Yu, C., and Micikevicius, P. Accelerating sparse deep neural networks.](https://arxiv.org/abs/2104.08378)
+[^7]: [Mingjie Sun, Zhuang Liu, Anna Bair, and J Zico Kolter. A simple and effective pruning approach for large language models. arXiv preprint arXiv:2306.11695, 2023.](https://arxiv.org/abs/2409.17481)
+[^8]: [Lu Yin, You Wu, Zhenyu Zhang, Cheng-Yu Hsieh, et al. Outlier weighed layerwise sparsity (OWL): A missing secret sauce for pruning llms to high sparsity, 2025.](https://arxiv.org/abs/2310.05175)
+[^9]: [Wenxuan Wang and Zhaopeng Tu. Rethinking the value of transformer components, 2020.](https://arxiv.org/abs/2011.03803)
+[^10]: [Jaeho Lee, Sejun Park, Sangwoo Mo, Sungsoo Ahn, et al. Layer-adaptive sparsity for the magnitudebased pruning, 2021.](https://arxiv.org/abs/2010.07611)
+[^11]: [OpenAI Triton](https://triton-lang.org/)
+[^12]: [Frantar, E., Ashkboos, S., Hoefler, T., and Alistarh, D. Optq: Accurate quantization for generative pre-trained transformers. In ICLR, 2022.](https://arxiv.org/abs/2210.17323)
